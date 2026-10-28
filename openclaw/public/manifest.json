@@ -1,0 +1,24 @@
+{
+    "id": "/openclaw",
+    "name": "OpenClaw AI",
+    "short_name": "OpenClaw",
+    "description": "OpenClaw AI assistant for ERPNext",
+    "start_url": "/openclaw/",
+    "scope": "/openclaw/",
+    "display": "standalone",
+    "orientation": "portrait",
+    "theme_color": "#2490ef",
+    "background_color": "#ffffff",
+    "icons": [
+        {
+            "src": "/assets/openclaw/icons/icon-192.png",
+            "sizes": "192x192",
+            "type": "image/png"
+        },
+        {
+            "src": "/assets/openclaw/icons/icon-512.png",
+            "sizes": "512x512",
+            "type": "image/png"
+        }
+    ]
+}

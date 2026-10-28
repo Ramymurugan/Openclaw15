@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>OpenClaw AI</title>
+
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background: #f5f5f5;
+            margin: 0;
+            padding: 40px;
+        }
+
+        .container {
+            max-width: 700px;
+            margin: auto;
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        #chat {
+            min-height: 300px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            margin-bottom: 15px;
+            border-radius: 8px;
+            overflow-y: auto;
+        }
+
+        .user {
+            text-align: right;
+            margin: 10px;
+        }
+
+        .assistant {
+            text-align: left;
+            margin: 10px;
+        }
+
+        .input-area {
+            display: flex;
+            gap: 10px;
+        }
+
+        input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ccc;
+            border-radius: 6px;
+        }
+
+        button {
+            padding: 12px 18px;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        #send {
+            background: #2490ef;
+            color: white;
+        }
+
+        #voice {
+            background: #666;
+            color: white;
+        }
+    </style>
+</head>
+
+<body>
+
+<div class="container">
+
+    <h1>🤖 OpenClaw AI</h1>
+
+    <div id="chat">
+        <div class="assistant">
+            <strong>OpenClaw:</strong>
+            Hello! How can I help you?
+        </div>
+    </div>
+
+    <div class="input-area">
+
+        <input
+            id="question"
+            type="text"
+            placeholder="Ask something..."
+        >
+
+        <button id="voice" onclick="startVoice()">
+            🎙️
+        </button>
+
+        <button id="send" onclick="sendQuestion()">
+            Ask
+        </button>
+
+    </div>
+
+</div>
+
+<script>
+
+async function sendQuestion() {
+
+    const input = document.getElementById("question");
+    const question = input.value.trim();
+
+    if (!question) {
+        return;
+    }
+
+    addMessage("You", question);
+
+    input.value = "";
+
+    try {
+
+        const response = await fetch(
+            "/api/method/openclaw.api.ask?question=" +
+            encodeURIComponent(question)
+        );
+
+        const data = await response.json();
+
+        console.log(data);
+
+        const answer =
+            data.message?.answer ||
+            data.message?.message ||
+            "I could not understand the response.";
+
+        addMessage("OpenClaw", answer);
+
+    } catch (error) {
+
+        console.error(error);
+
+        addMessage(
+            "OpenClaw",
+            "Sorry, something went wrong."
+        );
+    }
+}
+
+
+function addMessage(sender, message) {
+
+    const chat = document.getElementById("chat");
+
+    const div = document.createElement("div");
+
+    if (sender === "You") {
+        div.className = "user";
+    } else {
+        div.className = "assistant";
+    }
+
+    div.innerHTML =
+        "<strong>" + sender + ":</strong> " +
+        message;
+
+    chat.appendChild(div);
+
+    chat.scrollTop = chat.scrollHeight;
+}
+
+
+function startVoice() {
+
+    if (!("webkitSpeechRecognition" in window)) {
+
+        alert(
+            "Speech recognition is not supported in this browser."
+        );
+
+        return;
+    }
+
+    const recognition =
+        new webkitSpeechRecognition();
+
+    recognition.lang = "en-IN";
+
+    recognition.continuous = false;
+
+    recognition.interimResults = false;
+
+    recognition.start();
+
+    recognition.onresult = function(event) {
+
+        const text =
+            event.results[0][0].transcript;
+
+        document.getElementById("question").value = text;
+
+        sendQuestion();
+    };
+
+    recognition.onerror = function(event) {
+
+        console.error(
+            "Voice error:",
+            event.error
+        );
+
+    };
+}
+
+</script>
+
+</body>
+</html>
